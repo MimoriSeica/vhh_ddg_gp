@@ -38,6 +38,10 @@ def train(training_times, model, likelihood, optimizer, mll, train_x, train_y):
 def predict(train_x, train_y, test_x, training_times):
     train_x = torch.Tensor(train_x)
     train_y = torch.Tensor(train_y)
+    
+    # print(train_x.device)
+    # print(train_y.device)
+    
     likelihood = gpytorch.likelihoods.GaussianLikelihood()
     model = ExactGPModel(train_x, train_y, likelihood)
 
@@ -55,6 +59,9 @@ def predict(train_x, train_y, test_x, training_times):
     likelihood.eval()
     
     pred = likelihood(model(torch.Tensor(test_x)))
+    
+    # print(pred.mean.device)
+    
     means = pred.mean.detach().numpy()
     lower, upper = pred.confidence_region()
     lower = lower.detach().numpy()
