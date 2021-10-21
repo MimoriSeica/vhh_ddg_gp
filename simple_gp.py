@@ -5,6 +5,7 @@ import pandas as pd
 import math
 import torch
 import gpytorch
+from sklearn.model_selection import KFold
 
 
 class ExactGPModel(gpytorch.models.ExactGP):
@@ -59,3 +60,23 @@ def predict(train_x, train_y, test_x, training_times):
     lower = lower.detach().numpy()
     upper = upper.detach().numpy()
     return means, lower, upper
+
+
+def solve(data_x, data_y, n_splits, training_times, shuffle=True, random_state=1234):
+    kf = KFold(n_splits=n_splits, shuffle=shuffle, random_state=random_state)
+    ndatas = data_x.shape[0]
+    pred_y = np.zeros(ndatas)
+    lower_y = np.zeros(ndatas)
+    upper_y = np.zeros(ndatas)
+    for index, (train_indices, valid_indices) in enumerate(kf.split(range(ndatas))):
+        # print(index)
+        # print(train_indices)
+        # print(valid_indices)
+        train_x, test_x = data_x[train_indices], data_x[valid_indices] 
+        train_y = data_y[train_indices]
+        means, lower, upper = predict(train_x, train_y, test_x, training_times)
+        pred_y[valid_indices] = means
+        lower_y[valid_indices] = lower
+        upper_y[valid_indices] = upper
+
+    return pred_y, lower_y, upper_y
