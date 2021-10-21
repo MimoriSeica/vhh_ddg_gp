@@ -1,0 +1,3 @@
+[submodule "Kidera"]
+	path = Kidera
+	url = https://github.com/djhogan/Kidera.git
