@@ -58,7 +58,8 @@ def predict(train_x, train_y, test_x, training_times):
     model.eval()
     likelihood.eval()
     
-    pred = likelihood(model(torch.Tensor(test_x)))
+    with torch.no_grad():
+        pred = likelihood(model(torch.Tensor(test_x)))
     
     # print(pred.mean.device)
     
